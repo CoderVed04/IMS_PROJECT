@@ -19,6 +19,10 @@ const materialSchema = new mongoose.Schema({
     },
     created_on: {
         type: String
+    },
+    image: {
+        data: Buffer,
+        contentType: String
     }
 });
 
@@ -48,7 +52,11 @@ module.exports = {
                 state: materialData.state,
                 price: materialData.price,
                 name: materialData.name,
-                created_on: materialData.created_on
+                created_on: materialData.created_on,
+                image: {
+                    data: materialData.image.data,
+                    contentType: materialData.image.contentType
+                }
             };
             Material.findOneAndUpdate(query, update)
                 .then((updatedMaterial) => {

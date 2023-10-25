@@ -18,7 +18,7 @@
               </nav>
               <div class="container"><br>
                   <a href="../materials" class="btn green">Go Back</a>
-                  <form action="/editmaterial/<%= id %>" method="POST">
+                  <form action="/editmaterial/<%= id %>" method="POST" enctype="multipart/form-data">
                         <div class="col s12 m6">
                             <div class="card black-text text-darken-2">
                                   <div class="card-content">
@@ -46,6 +46,10 @@
                                                 <label>Quantity(unit(s))</label>
                                                 <input type="number" placeholder="0" name="qty">
                                             </div>
+                                            <div>
+                                              <label for="image">Image:</label>
+                                              <input type="file" id="image" name="image">
+                                            </div><br>
                                         </div>
                                         <input type="submit" class="btn blue" value="submit">
                                   </div>

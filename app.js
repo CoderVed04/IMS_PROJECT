@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const ejs = require('ejs');
 const {
   registerUser,
@@ -12,6 +15,22 @@ const {
 app.set('view engine', 'ejs');
 app.use(bodyparser.json());//parsing the application/json
 app.use(bodyparser.urlencoded({ extended: true }));//parses the x-www-form-urlencoded
+
+// Set up multer storage engine
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Set up multer upload middleware
+const upload = multer({ storage: storage });
 
 Material = require('./models/material');
 Suppliers = require('./models/supplier');
@@ -82,29 +101,75 @@ app.get('/materials', (req, res) => {
   
   
 // add the materials
-app.post('/addmaterial',async (req, res)=>{
-    var name = req.body.name;
-    var price = req.body.price;
-    var state = req.body.state;
-    var qty = req.body.qty;
-    var on = today();
-    try {
-        const material = await Material.addMaterial({
-          name: name,
-          price: price,
-          qty: qty,
-          state: state,
-          created_on: on,
-        });
+// app.post('/addmaterial', upload.single('image'),async (req, res)=>{
+//     var name = req.body.name;
+//     var price = req.body.price;
+//     var state = req.body.state;
+//     var qty = req.body.qty;
+//     var on = today();
+//     var image = req.file;
+//     try {
+//         const material = await Material.addMaterial({
+//           name: name,
+//           price: price,
+//           qty: qty,
+//           state: state,
+//           image: {
+//             data: image.buffer,
+//             contentType: image.mimetype
+//           },
+//           created_on: on,
+//         });
     
-        res.redirect('/materials');
-      } catch (err) {
-        console.error('Error adding material:', err);
-        res.render('addmaterial', {
-          msg: 'Please fill required details!',
-        });
-      }
+//         res.redirect('/materials');
+//       } catch (err) {
+//         console.error('Error adding material:', err);
+//         res.render('addmaterial', {
+//           msg: 'Please fill required details!',
+//         });
+//       }
+// });
+
+app.post('/addmaterial', upload.single('image'), async (req, res) => {
+  var name = req.body.name;
+  var price = req.body.price;
+  var state = req.body.state;
+  var qty = req.body.qty;
+  var on = today();
+  var image = req.file;
+
+  if (image) {
+    try {
+      const imageBuffer = await fs.promises.readFile(image.path); // Read the image asynchronously
+      const base64Image = imageBuffer.toString('base64');
+
+      const material = await Material.addMaterial({
+        name: name,
+        price: price,
+        qty: qty,
+        state: state,
+        image: {
+          data: base64Image,
+          contentType: image.mimetype
+        },
+        created_on: on,
+      });
+
+      res.redirect('/materials');
+    } catch (err) {
+      console.error('Error adding material:', err);
+      res.render('addmaterial', {
+        msg: 'Please fill required details!',
+      });
+    }
+  } else {
+    console.error('No image uploaded');
+    res.render('addmaterial', {
+      msg: 'Please upload an image!',
+    });
+  }
 });
+
 // update the material data
 app.post('/editmaterial/:id',(req ,res)=>{
     var  id = req.params.id;
