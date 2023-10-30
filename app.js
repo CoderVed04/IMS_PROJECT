@@ -10,6 +10,7 @@ const {
   registerUser,
   loginUser
 } = require("../IMS/models/user");
+const {loginAdmin} = require("../IMS/models/admin");
 
 
 app.set('view engine', 'ejs');
@@ -36,6 +37,7 @@ Material = require('./models/material');
 Suppliers = require('./models/supplier');
 Order = require('./models/order');
 User = require('./models/user');
+Admin = require('./models/admin');
 
 mongoose.connect('mongodb://127.0.0.1:27017/inventory', { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
@@ -486,6 +488,29 @@ app.post('/login', loginUser,(req, res) =>{
   console.log("Inside post method of /login route");
   if(err){throw err}
   res.redirect('/login')
+});
+//-------------------------------------------------------------------
+app.get('/adminlogin',(req, res) => {
+  res.render('adminlogin');
+});
+
+app.post('/adminlogin', loginAdmin,(req, res) =>{
+  console.log("Inside post method of /adminlogin route");
+  if(err){throw err}
+  res.redirect('/adminlogin')
+});
+//-------------------------------------------------------------------
+
+app.get('/dashboard', async (req, res) => {
+  try {
+    const materials = await Material.find();
+    const suppliers = await Supplier.find();
+    const orders = await Order.find();
+    res.render('dashboard', { materials, suppliers, orders });
+  } catch (err) {
+    console.error('Error getting data:', err);
+    res.render('dashboard', { materials: [], suppliers: [], orders: [] });
+  }
 });
 //-------------------------------------------------------------------
 

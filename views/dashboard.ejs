@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <h1>Dashboard</h1>
+    <h2>Materials</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>State</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>created_on</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (obj && obj.length) { %>
+        <% obj.forEach(function(object) { %>
+        <tr>
+            <td><%= object.name %></td>
+            <td><%= object.state %></td>
+            <td>$&nbsp;<%= object.price %></td>
+            <td><%= object.qty %></td>
+            <td><%= object.created_on %></td>
+        </tr>
+        <% }); %>
+        <% } else { %>
+        <tr>
+            <td colspan="7">No materials available</td>
+        </tr>
+        <% } %>
+    </tbody>
+    </table>
+    <h2>Suppliers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% suppliers.forEach((supplier) => { %>
+          <tr>
+            <td><%= supplier.name %></td>
+            <td><%= supplier.address %></td>
+            <td><%= supplier.phone %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <h2>Orders</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Supplier</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach((order) => { %>
+          <tr>
+            <td><%= order.material %></td>
+            <td><%= order.supplier %></td>
+            <td><%= order.quantity %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>
