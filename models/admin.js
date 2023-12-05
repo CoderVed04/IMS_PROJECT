@@ -47,10 +47,11 @@ const loginAdmin = async (req, res, next) => {
         // comparing given password with hashed password
         bcrypt.compare(password, admin.password).then(function (result) {
           result
-            ? res.status(200).json({
-                message: "Login successful",
-                user,
-              })
+            ? res.redirect('users')
+            // res.status(200).json({
+            //     message: "Login successful",
+            //     user,
+            //   })
             : res.status(400).json({ message: "Login not successful" })
         })
       }

@@ -8,7 +8,9 @@ const path = require('path');
 const ejs = require('ejs');
 const {
   registerUser,
-  loginUser
+  loginUser,
+  getUsers,
+  removeUser
 } = require("../IMS/models/user");
 const {loginAdmin} = require("../IMS/models/admin");
 
@@ -499,19 +501,132 @@ app.post('/adminlogin', loginAdmin,(req, res) =>{
   if(err){throw err}
   res.redirect('/adminlogin')
 });
-//-------------------------------------------------------------------
 
-app.get('/dashboard', async (req, res) => {
+//getting users
+app.get('/users', (req, res) => {
+  User.getUsers()
+      .then((users) => {
+          res.render('user', { obj: users }); // Ensure you pass materials to the view
+      })
+      .catch((err) => {
+          console.error('Error getting users:', err);
+          res.render('user', { obj: [] }); // Pass an empty array if there's an error or no materials
+      });
+});
+
+//delete the data of users
+app.post('/deleteuser/:_id',(req , res)=>{
+  var id = req.params._id;
+  User.removeUser(id , (err ,callback)=>{
+      if(err){throw err}
+      res.redirect('/users');
+      } );
+});
+
+//getting materials
+app.get('/adminmaterials', (req, res) => {
+  Material.getMaterials()
+      .then((materials) => {
+          res.render('adminMaterial', { obj: materials }); // Ensure you pass materials to the view
+      })
+      .catch((err) => {
+          console.error('Error getting materials:', err);
+          res.render('adminMaterial', { obj: [] }); // Pass an empty array if there's an error or no materials
+      });
+});
+
+app.post('/adminshowmaterials/:_id', async (req, res) => {
   try {
-    const materials = await Material.find();
-    const suppliers = await Supplier.find();
-    const orders = await Order.find();
-    res.render('dashboard', { materials, suppliers, orders });
+    const id = req.params._id;
+    const material = await Material.findById(id);
+    if (!material) {
+      console.log("Material not found");
+      res.status(404).send('Material not found');
+    } else {
+      console.log("Inside showmaterials");
+      res.render('adminshowmaterials', { obj: material });
+    }
   } catch (err) {
-    console.error('Error getting data:', err);
-    res.render('dashboard', { materials: [], suppliers: [], orders: [] });
+    console.log("Error retrieving material")
+    console.error(err);
+    res.status(500).send('Error retrieving material');
   }
 });
+
+//getting suppliers
+app.get('/adminsuppliers', (req, res) => {
+  Suppliers.getSuppliers()
+      .then((suppliers) => {
+          res.render('adminSupplier', { obj: suppliers }); // Ensure you pass materials to the view
+      })
+      .catch((err) => {
+          console.error('Error getting suppliers:', err);
+          res.render('adminSupplier', { obj: [] }); // Pass an empty array if there's an error or no materials
+      });
+});
+
+app.get('/adminshowsupplier/:_id', async (req, res) => {
+  try {
+    const id = req.params._id;
+    const supplier = await Suppliers.getSuppliersById(id);
+    if (!supplier) {
+      console.log("Supplier not found");
+      res.status(404).send('Supplier not found');
+    } else {
+      console.log("Inside showsupplier");
+      res.render('adminshowsupplier', { obj: supplier });
+    }
+  } catch (err) {
+    console.log("Error retrieving supplier")
+    console.error(err);
+    res.status(500).send('Error retrieving supplier');
+  }
+});
+
+//getting orders
+app.get('/adminorders', (req, res) => {
+  Order.getOrders()
+      .then((orders) => {
+          res.render('adminOrder', { obj: orders }); // Ensure you pass orders to the view
+      })
+      .catch((err) => {
+          console.error('Error getting orders:', err);
+          res.render('adminOrder', { obj: [] }); // Pass an empty array if there's an error or no materials
+      });
+});
+
+ //show order
+ app.post('/adminshoworder/:_id', async (req, res) => {
+  try {
+    const id = req.params._id;
+    const order = await Order.findById(id);
+    if (!order) {
+      console.log("Order not found");
+      res.status(404).send('Order not found');
+    } else {
+      console.log("Inside showorder");
+      res.render('adminshoworder', { obj: order });
+    }
+  } catch (err) {
+    console.log("Error retrieving order")
+    console.error(err);
+    res.status(500).send('Error retrieving order');
+  }
+});
+//-------------------------------------------------------------------
+
+// app.get('/dashboard', async (req, res) => {
+//   try {
+//     const materials = await Material.find();
+//     const suppliers = await Supplier.find();
+//     const orders = await Order.find();
+//     res.render('dashboard', { materials, suppliers, orders });
+//   } catch (err) {
+//     console.error('Error getting data:', err);
+//     res.render('dashboard', { materials: [], suppliers: [], orders: [] });
+//   }
+// });
+
 //-------------------------------------------------------------------
 
 app.listen(8080, ()=>{

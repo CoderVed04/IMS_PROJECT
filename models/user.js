@@ -166,11 +166,14 @@ const registerUser = async (req, res, next) => {
       } else {
         // comparing given password with hashed password
         bcrypt.compare(password, user.password).then(function (result) {
+          // return result
           result
-            ? res.status(200).json({
-                message: "Login successful",
-                user,
-              })
+            ? 
+            res.redirect('/materials')
+            // res.status(200).json({
+            //     message: "Login successful",
+            //     user,
+            //   })
             : res.status(400).json({ message: "Login not succesful" })
         })
       }
@@ -201,7 +204,22 @@ const registerUser = async (req, res, next) => {
 //     }
 //   });
 
+const getUsers = function() {
+  return User.find({}).exec();
+};
+
+const removeUser = function(id) {
+  return User.deleteOne({ _id: id }).then(() => {
+    console.log('User deleted successfully');
+  }).catch((err) => {
+    console.error(err);
+    throw err;
+  });
+};
+
   module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    getUsers,
+    removeUser
   };
