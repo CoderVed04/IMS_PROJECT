@@ -22,7 +22,7 @@ app.use(bodyparser.urlencoded({ extended: true }));//parses the x-www-form-urlen
 // Set up multer storage engine
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, 'public/uploads/');
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 });
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join( 'public')));
 
 // Set up multer upload middleware
 const upload = multer({ storage: storage });
@@ -144,18 +144,12 @@ app.post('/addmaterial', upload.single('image'), async (req, res) => {
 
   if (image) {
     try {
-      const imageBuffer = await fs.promises.readFile(image.path); // Read the image asynchronously
-      const base64Image = imageBuffer.toString('base64');
-
       const material = await Material.addMaterial({
         name: name,
         price: price,
         qty: qty,
         state: state,
-        image: {
-          data: base64Image,
-          contentType: image.mimetype
-        },
+        imagePath: '/uploads/' + image.filename,
         created_on: on,
       });
 
@@ -201,31 +195,6 @@ app.post('/deletematerial/:_id',(req , res)=>{
         res.redirect('/materials');
         } );
 });
-// app.post('/showmaterials/:_id',(req ,res)=>{
-//     var id = req.params.id;
-//     console.log("Inside showmaterials");
-//     Material.findById(id , (err , material)=>{
-//         if(err){throw err;}
-//         res.redirect('showmaterials', {obj:material});
-//     });
-// });
-
-// app.post('/showmaterials/:_id', (req, res) => {
-//     var id = req.params._id;
-//     Material.findById(id, (err, material) => {
-//       if (err) {
-//         console.log("Error retrieving material")
-//         console.error(err);
-//         res.status(500).send('Error retrieving material');
-//       } else if (!material) {
-//         console.log("Material not found");
-//         res.status(404).send('Material not found');
-//       } else {
-//         console.log("Inside showmaterials");
-//         res.render('showmaterials', { obj: material });
-//       }
-//     });
-//   });
 
 app.post('/showmaterials/:_id', async (req, res) => {
     try {
@@ -236,7 +205,8 @@ app.post('/showmaterials/:_id', async (req, res) => {
         res.status(404).send('Material not found');
       } else {
         console.log("Inside showmaterials");
-        res.render('showmaterials', { obj: material });
+        res.render('showmaterials', { obj: material, imagePath: material.imagePath });
+        console.log("imagePath:", material.imagePath);
       }
     } catch (err) {
       console.log("Error retrieving material")
@@ -543,8 +513,9 @@ app.post('/adminshowmaterials/:_id', async (req, res) => {
       console.log("Material not found");
       res.status(404).send('Material not found');
     } else {
-      console.log("Inside showmaterials");
-      res.render('adminshowmaterials', { obj: material });
+      console.log("Inside adminshowmaterials");
+      res.render('adminshowmaterials', { obj: material, imagePath: material.imagePath });
+      console.log("imagePath:", material.imagePath);
     }
   } catch (err) {
     console.log("Error retrieving material")
@@ -552,6 +523,7 @@ app.post('/adminshowmaterials/:_id', async (req, res) => {
     res.status(500).send('Error retrieving material');
   }
 });
+
 
 //getting suppliers
 app.get('/adminsuppliers', (req, res) => {

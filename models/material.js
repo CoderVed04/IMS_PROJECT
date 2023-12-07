@@ -23,6 +23,9 @@ const materialSchema = new mongoose.Schema({
     image: {
         data: Buffer,
         contentType: String
+    },
+    imagePath: {
+        type: String
     }
 });
 

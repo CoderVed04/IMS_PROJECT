@@ -25,13 +25,13 @@
                             <li class="collection-item"><b>Quantity</b><br><%= obj.qty%></li>
                             <li class="collection-item"><b>Total expense</b><br>Rs&nbsp;<%= obj.price * obj.qty%></li>
                             <li class="collection-item"><b>Created on</b><br><%= obj.created_on%></li>      
-                            <% if (obj.image && obj.image.data) { %>
+                            <% if (obj.imagePath) { %>
                               <li class="collection-item"><b>Image</b><br>
-                                <img src="<%= 'data:' + obj.image.contentType + ';base64,' + obj.image.data.toString('base64') %>" alt="Material Image">
+                                  <img src="<%= obj.imagePath %>">
                               </li>
-                            <% } else { %>
+                          <% } else { %>
                               <li class="collection-item">Image not available</li>
-                            <% } %>                   
+                          <% } %>                  
                           
                     </ul>
               </div>

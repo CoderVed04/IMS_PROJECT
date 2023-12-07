@@ -98,10 +98,11 @@ const registerUser = async (req, res, next) => {
       mobile
     })
       .then((user) =>
-        res.status(200).json({
-          message: "User successfully created",
-           user,
-        })
+        // res.status(200).json({
+        //   message: "User successfully created",
+        //    user,
+        // })
+        res.redirect('login')
       )
       .catch((error) =>
         res.status(400).json({
