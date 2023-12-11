@@ -169,24 +169,41 @@ app.post('/addmaterial', upload.single('image'), async (req, res) => {
 });
 
 // update the material data
-app.post('/editmaterial/:id',(req ,res)=>{
-    var  id = req.params.id;
-    var name = req.body.name;
-    var price = req.body.price;
-    var qty = req.body.qty;
-    var state = req.body.state;
-    //for creating date
-    var on = today();
-    Material.updateMaterial(id , {
-        name:name,price:price,qty:qty,state:state,created_on:on
-    },{}, (err , callback)=>{
-        if(err){
-            res.render('editmaterial', {msg:"Error Occured."});
-        }
-        // res.render('editmaterial' ,{ id:id ,msg:"Successfully updated!!"} );
-        res.redirect('/materials');
-    });
- });
+app.post('/editmaterial/:id', upload.single('image'), (req ,res)=>{
+  var  id = req.params.id;
+  var name = req.body.name;
+  var price = req.body.price;
+  var qty = req.body.qty;
+  var state = req.body.state;
+  var on = today();
+  var image = req.file;
+
+  if (image) {
+      var materialData = {
+          name: name,
+          price: price,
+          qty: qty,
+          state: state,
+          created_on: on,
+          imagePath: '/uploads/' + image.filename
+      };
+  } else {
+      var materialData = {
+          name: name,
+          price: price,
+          qty: qty,
+          state: state,
+          created_on: on
+      };
+  }
+
+  Material.updateMaterial(id , materialData, {}, (err , callback)=>{
+      if(err){
+          res.render('editmaterial', {msg:"Error Occured."});
+      }
+      res.redirect('/materials');
+  });
+});
 //delete the data of materials
 app.post('/deletematerial/:_id',(req , res)=>{
     var id = req.params._id;

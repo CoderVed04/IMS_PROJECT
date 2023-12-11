@@ -56,10 +56,8 @@ module.exports = {
                 price: materialData.price,
                 name: materialData.name,
                 created_on: materialData.created_on,
-                image: {
-                    data: materialData.image.data,
-                    contentType: materialData.image.contentType
-                }
+                imagePath: materialData.imagePath,
+                
             };
             Material.findOneAndUpdate(query, update)
                 .then((updatedMaterial) => {
